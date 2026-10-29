@@ -1,0 +1,634 @@
+<title>Teste Nutri Pet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: coluna única de leitura (até 760px), uma questão por tela, resultado com tigela que enche conforme os acertos. */
+:root {
+  --bg: #EDF3F1;
+  --surface: #FBFDFC;
+  --ink: #10252A;
+  --ink-2: #425D62;
+  --line: #CCDAD7;
+  --chip: #DFEBE8;
+  --accent: #0B6B73;
+  --accent-ink: #FFFFFF;
+  --hi: #EDB02A;
+  --kib: #A8672B;
+  --ok: #1B7A4B;
+  --ok-bg: #DCF1E4;
+  --bad: #A9392A;
+  --bad-bg: #F8E2DD;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C1719; --surface: #142226; --ink: #E8F1EF; --ink-2: #A9C0BC; --line: #2A3F43; --chip: #1C2F33;
+    --accent: #4FC3CB; --accent-ink: #06191B; --hi: #F2B632; --kib: #C98A3C;
+    --ok: #67D497; --ok-bg: #12301F; --bad: #F29484; --bad-bg: #3A1A15;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C1719; --surface: #142226; --ink: #E8F1EF; --ink-2: #A9C0BC; --line: #2A3F43; --chip: #1C2F33;
+  --accent: #4FC3CB; --accent-ink: #06191B; --hi: #F2B632; --kib: #C98A3C;
+  --ok: #67D497; --ok-bg: #12301F; --bad: #F29484; --bad-bg: #3A1A15;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  padding-block: 20px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 760px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--hi); outline-offset: 2px; border-radius: 6px; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+.brand svg { width: 38px; height: 32px; flex: none; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; padding: 12px 22px; font-weight: 700; border: 2px solid var(--accent); background: var(--accent); color: var(--accent-ink); cursor: pointer; text-decoration: none; }
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover:not(:disabled) { border-color: var(--ink-2); filter: none; }
+.btn.small { padding: 8px 16px; font-size: 14px; }
+
+/* home */
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.hero h1 { font-size: clamp(32px, 7vw, 52px); font-weight: 800; margin: 10px 0 16px; }
+.hero .lead { font-size: 18px; color: var(--ink-2); max-width: 60ch; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 26px; }
+.pill { background: var(--chip); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 44px; }
+.theme { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; min-width: 0; }
+.theme h2 { font-size: 21px; margin: 6px 0 10px; }
+.theme ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; }
+.theme li + li { margin-top: 4px; }
+.how { margin-top: 44px; display: grid; gap: 14px; }
+.how h2 { font-size: 24px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.step { border-top: 3px solid var(--hi); padding-top: 12px; min-width: 0; }
+.step b { font-family: var(--font-display); font-size: 18px; display: block; margin-bottom: 4px; }
+.step p { color: var(--ink-2); font-size: 15px; }
+.fine { margin-top: 36px; font-size: 13px; color: var(--ink-2); max-width: 70ch; }
+
+/* quiz */
+.meta { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--ink-2); font-weight: 600; margin-bottom: 8px; flex-wrap: wrap; }
+.seg { display: flex; gap: 4px; }
+.qhead { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.qmeta { flex: 1; min-width: 0; }
+.qmeta .meta { margin-bottom: 10px; }
+.bowlwrap { flex: none; text-align: center; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.qhead .bowl { width: 84px; display: block; margin: 0 auto 2px; }
+.fill { transform: translateY(0); }
+.drops circle { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .fill { transition: transform .7s cubic-bezier(.3,.8,.3,1); }
+  .drops.go circle { animation: drop .75s ease-in forwards; }
+  .drops.go circle:nth-child(2) { animation-delay: .1s; }
+  .drops.go circle:nth-child(3) { animation-delay: .2s; }
+}
+@keyframes drop { 0% { transform: translateY(-34px); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(20px); opacity: 0; } }
+.seg i { flex: 1; height: 7px; border-radius: 4px; background: var(--line); }
+.seg i.cur { background: var(--ink-2); }
+.seg i.ok { background: var(--ok); }
+.seg i.no { background: var(--bad); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: clamp(18px, 4vw, 32px); }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tag { background: var(--chip); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.tag.crit { background: var(--hi); color: #2A1E00; }
+.qtext { font-size: clamp(20px, 4.2vw, 26px); font-weight: 700; margin-bottom: 20px; outline: none; }
+.opts { display: grid; gap: 10px; border: 0; margin: 0; padding: 0; min-width: 0; }
+.opt { position: relative; display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; border: 2px solid var(--line); border-radius: 14px; padding: 13px 14px; cursor: pointer; background: var(--bg); min-width: 0; }
+.opt:hover { border-color: var(--ink-2); }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt .let { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--surface); }
+.opt .tx { padding-top: 3px; overflow-wrap: anywhere; }
+.opt:has(input:checked) { border-color: var(--accent); background: var(--surface); }
+.opt:has(input:checked) .let { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.opt:has(input:focus-visible) { outline: 3px solid var(--hi); outline-offset: 2px; }
+.opt.locked { cursor: default; }
+.opt.right { border-color: var(--ok); background: var(--ok-bg); }
+.opt.right .let { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.wrong .let { background: var(--bad); border-color: var(--bad); color: var(--surface); }
+.opt.dim { opacity: .65; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+.actions .spacer { flex: 1; }
+.hint { margin-top: 14px; padding: 12px 14px; border-radius: 12px; border: 1px dashed var(--ink-2); color: var(--ink-2); font-size: 15px; }
+.fb { margin-top: 20px; border-radius: 16px; padding: 18px; border: 1px solid var(--line); background: var(--bg); display: grid; gap: 10px; }
+.fb.ok { border-color: var(--ok); }
+.fb.no { border-color: var(--bad); }
+.fb h3 { font-size: 20px; }
+.fb.ok h3 { color: var(--ok); }
+.fb.no h3 { color: var(--bad); }
+.fb p { overflow-wrap: anywhere; }
+.crit-box { background: var(--surface); border-left: 4px solid var(--hi); border-radius: 8px; padding: 10px 14px; font-size: 15px; }
+.crit-box b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 2px; }
+.src { font-size: 13px; color: var(--ink-2); }
+
+/* result */
+.res-head { display: grid; grid-template-columns: 170px 1fr; gap: 24px; align-items: center; }
+@media (max-width: 560px) { .res-head { grid-template-columns: 1fr; justify-items: start; } }
+.bowl { width: 170px; height: auto; }
+.score { font-family: var(--font-display); font-weight: 800; font-size: clamp(40px, 9vw, 64px); line-height: 1; }
+.score small { font-size: .4em; font-weight: 600; color: var(--ink-2); }
+.res-head p { color: var(--ink-2); margin-top: 10px; max-width: 52ch; }
+.bars { display: grid; gap: 14px; margin: 30px 0 8px; }
+.bar b { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; margin-bottom: 6px; }
+.track { height: 12px; background: var(--line); border-radius: 8px; overflow: hidden; }
+.track span { display: block; height: 100%; background: var(--accent); border-radius: 8px; }
+.sec { margin-top: 42px; }
+.sec h2 { font-size: 26px; margin-bottom: 6px; }
+.sec .sub { color: var(--ink-2); margin-bottom: 16px; max-width: 62ch; }
+.list { display: grid; gap: 12px; }
+.miss { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; min-width: 0; }
+.miss summary { cursor: pointer; font-weight: 700; display: flex; gap: 10px; }
+.miss summary .n { color: var(--bad); flex: none; }
+.miss .body { margin-top: 12px; display: grid; gap: 10px; font-size: 15px; }
+.miss .body p { overflow-wrap: anywhere; }
+.yours { color: var(--bad); }
+.correct { color: var(--ok); font-weight: 600; }
+.read { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: grid; gap: 6px; min-width: 0; }
+.read h3 { font-size: 18px; }
+.read h3 a { text-decoration-thickness: 2px; overflow-wrap: anywhere; }
+.read .kind { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.read p { font-size: 15px; color: var(--ink-2); }
+.read .why { color: var(--ink); }
+.read .rel { font-size: 13px; color: var(--ink-2); }
+.row-btn { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 36px; }
+@media (prefers-reduced-motion: no-preference) { .track span { transition: width .6s ease; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 76 64" aria-hidden="true"><path d="M6 26 H70 C70 48 56 60 38 60 C20 60 6 48 6 26 Z" fill="var(--hi)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/><ellipse cx="38" cy="26" rx="32" ry="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="4"/><circle cx="26" cy="14" r="5" fill="var(--accent)"/><circle cx="40" cy="9" r="5" fill="var(--accent)"/><circle cx="52" cy="15" r="5" fill="var(--accent)"/></svg>
+      <span>Nutri Pet</span>
+    </div>
+    <button class="btn ghost small" id="restart" hidden>Voltar ao início</button>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="hero">
+      <p class="eyebrow">Nutrição de Cães e Gatos · Aulas 1 e 2</p>
+      <h1>Você sabe ler o que a ciência e o mercado dizem sobre a comida do pet?</h1>
+      <p class="lead">São <span data-total>24</span> questões para estudar e treinar o olhar crítico sobre dados, estudos e tendências. Você responde, vê a explicação na hora, enche o potinho a cada acerto e, no final, recebe leituras sugeridas a partir dos seus erros.</p>
+      <div class="pills">
+        <span class="pill">Sem nota e sem ranking</span>
+        <span class="pill">Anônimo</span>
+        <span class="pill">Explicação a cada questão</span>
+        <span class="pill">Potinho que enche a cada acerto</span>
+        <span class="pill">Cerca de 25 minutos</span>
+      </div>
+      <button class="btn" id="start">Começar o teste</button>
+
+      <div class="themes">
+        <article class="theme">
+          <p class="eyebrow">Tema 1 · <span data-count="S">7</span> questões</p>
+          <h2>Pets na sociedade e nas casas</h2>
+          <ul>
+            <li>Quantos lares têm cães e gatos, e quem são os tutores</li>
+            <li>Companhia, saúde mental e cães de assistência</li>
+            <li>Adoção e abandono durante a pandemia</li>
+            <li>Como conferir a idade e a origem de um dado</li>
+          </ul>
+        </article>
+        <article class="theme">
+          <p class="eyebrow">Tema 2 · <span data-count="A">7</span> questões</p>
+          <h2>Importância da alimentação de cães e gatos</h2>
+          <ul>
+            <li>Avaliação nutricional como quinto sinal vital</li>
+            <li>Peso, longevidade e doenças crônicas</li>
+            <li>Dietas, ingredientes e o caso da DCM</li>
+          </ul>
+        </article>
+        <article class="theme">
+          <p class="eyebrow">Tema 3 · <span data-count="B">10</span> questões</p>
+          <h2>Mercado, tendências e pesquisa</h2>
+          <ul>
+            <li>Humanização e premiumização</li>
+            <li>Como ler números de mercado e de impostos</li>
+            <li>Proteínas alternativas e sustentabilidade</li>
+            <li>Evidência científica e prática profissional</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="how">
+        <h2>Como funciona</h2>
+        <div class="steps">
+          <div class="step"><b>Responda</b><p>Escolha uma alternativa. Se travar, abra a dica, que não tira nada de você.</p></div>
+          <div class="step"><b>Entenda</b><p>Depois de confirmar, veja por que a resposta está certa e qual pergunta fazer diante de dados parecidos.</p></div>
+          <div class="step"><b>Leia</b><p>No fim, o teste mostra seus acertos e indica textos ligados às questões que você errou.</p></div>
+        </div>
+      </div>
+      <p class="fine">Nada que você responde é enviado ou guardado. Os dados citados vêm de fontes públicas, e cada explicação diz de onde a informação veio. Relatórios de consultorias aparecem identificados como tal, para você treinar a conferir metodologia antes de confiar em um número.</p>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" hidden>
+      <div class="qhead">
+        <div class="bowlwrap"><div id="bowlslot"></div><span class="hits" id="hits" aria-live="polite">0 acertos</span></div>
+        <div class="qmeta">
+          <div class="meta"><span id="qcount"></span><span id="qtheme"></span></div>
+          <div class="seg" id="seg" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tags" id="tags"></div>
+        <h2 class="qtext" id="qtext" tabindex="-1"></h2>
+        <form id="form" onsubmit="return false">
+          <fieldset class="opts" id="opts"><legend style="position:absolute;left:-9999px">Alternativas</legend></fieldset>
+        </form>
+        <div id="hint" class="hint" hidden></div>
+        <div id="fb"></div>
+        <div class="actions">
+          <button class="btn ghost small" id="hintBtn" type="button">Mostrar dica</button>
+          <span class="spacer"></span>
+          <button class="btn" id="confirm" type="button" disabled>Confirmar resposta</button>
+          <button class="btn" id="next" type="button" hidden>Próxima questão</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="result" hidden></section>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var THEMES = { S: "Pets na sociedade e nas casas", A: "Importância da alimentação", B: "Mercado, tendências e pesquisa" };
+
+  var READINGS = {
+    ibge: { kind: "Dados oficiais, em resumo jornalístico", title: "População de cães supera a de crianças, diz IBGE", src: "Legismap, sobre a PNS 2013 do IBGE", url: "https://legismap.com.br/conteudos/artigos-e-noticias/populacao-de-caes-supera-a-de-criancas-diz-ibge", why: "Traz os números de cães, gatos e domicílios da PNS 2013. Depois, procure a edição mais recente da pesquisa." },
+    ibge19: { kind: "Dados oficiais, em reportagem", title: "Quase 48 milhões de domicílios no Brasil tem cães ou gatos, aponta pesquisa do IBGE", src: "Correio Braziliense, 4/9/2020, sobre a PNS 2019", url: "https://www.correiobraziliense.com.br/brasil/2020/09/4873376-quase-48-milhoes-de-domicilios-no-brasil-tem-caes-ou-gatos-aponta-pesquisa-do-ibge.html", why: "Resume a PNS 2019: domicílios com cães e gatos, diferenças por região e vacinação. Compare com a PNS 2013." },
+    sbu: { kind: "Relatório de agência de avaliação", title: "The effect of assistance dogs for people with physical or psychological disabilities", src: "SBU, Suécia, 2019", url: "https://www.sbu.se/en/publications/responses-from-the-sbu-enquiry-service/the-effect-of-assistance-dogs-for-people-with-physical-or-psychological-disabilities/", why: "Resume quatro revisões sistemáticas sobre cães de assistência e mostra como avaliar a qualidade da evidência." },
+    epi: { kind: "Revisão de escopo", title: "Dog alerting and/or responding to epileptic seizures: A scoping review", src: "Artigo em acesso aberto (PMC)", url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6279040/", why: "Ponto de partida para o tema epilepsia, que o relatório da SBU não cobre." },
+    episr: { kind: "Revisão sistemática", title: "Service dogs for epileptic people, a systematic literature review", src: "Arquivo aberto HAL, Universidade de Rennes 1", url: "https://hal-univ-rennes1.archives-ouvertes.fr/hal-01858153v1", why: "Revisão sistemática sobre cães de serviço para pessoas com epilepsia." },
+    carroll22: { kind: "Artigo científico", title: "Companion animal adoption and relinquishment during the COVID-19 pandemic: Peri-pandemic pets at greatest risk of relinquishment", src: "Carroll, Torjussen e Reeve, Frontiers in Veterinary Science, 2022", url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9563850/", why: "Questionário com 3.945 respostas, em sua maioria do Reino Unido e dos EUA: quem considerou ou entregou o animal e por quê." },
+    carroll24: { kind: "Artigo científico", title: "Companion animal adoption and relinquishment during the COVID-19 pandemic: The experiences of animal rescue staff and volunteers", src: "Carroll, Reeve e Torjussen, Animal Welfare, 2024", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10951665", why: "Entrevistas com 28 organizações de resgate sobre adoção, entrega e efeito dos lockdowns. Estudo qualitativo, com limites de generalização." },
+    silva21: { kind: "Artigo científico", title: "Percepção dos tutores sobre o comportamento de cães e gatos frente ao isolamento social devido à pandemia de COVID-19", src: "Silva et al., Revista Acadêmica Ciência Animal, 2021", url: "https://periodicos.pucpr.br/cienciaanimal/article/download/27490/pdf", why: "Estudo brasileiro (Santarém, PA) com 168 tutores. Bom exemplo para treinar a leitura das limitações de uma amostra." },
+    congresso: { kind: "Imprensa política", title: "Projeto prevê desconto de 60% em tributos sobre ração para pets", src: "Congresso em Foco, 13/9/2026", url: "https://www.congressoemfoco.com.br/noticia/122165/projeto-preve-desconto-de-60-em-tributos-sobre-racao-para-pets", why: "Descreve o PLP 252/2026 e a tributação atual. Acompanhe a tramitação no site da Câmara dos Deputados." },
+    ipi: { kind: "Consultoria tributária (fonte secundária)", title: "Alíquota de IPI sobre ração para cães e gatos", src: "Tributo Devido, 2025", url: "https://tributodevido.com.br/portal/aliquota-de-ipi-sobre-racao-para-caes-e-gatos/", why: "Explica o IPI de 10% segundo a Solução de Consulta Cosit nº 139/2018. Confirme na TIPI e na legislação vigente." },
+    reme: { kind: "Artigo científico", title: "Animais de estimação na população brasileira, perfil sociodemográfico e depressão: PNS 2019", src: "Revista Mineira de Enfermagem, 2026", url: "https://periodicos.ufmg.br/index.php/reme/article/view/57510", why: "Usa a PNS 2019 para estimar quantos adultos têm cães ou gatos em casa e mostra como um dado oficial vira pesquisa." },
+    wsava: { kind: "Diretriz", title: "WSAVA Nutritional Assessment Guidelines", src: "Freeman et al., Journal of Feline Medicine and Surgery, 2011", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC11107980/", why: "É a base do quinto sinal vital: triagem, avaliação estendida, ECC, ECM, dieta e manejo alimentar." },
+    vetnurse: { kind: "Artigo científico", title: "The nutritional assessment and senior patients", src: "Holt SL. Veterinary Nursing Journal, 2021;36(12):346-349. DOI 10.1080/17415349.2021.1951635", url: "https://doi.org/10.1080/17415349.2021.1951635", why: "Artigo de enfermagem veterinária sobre avaliação nutricional. Cita um levantamento com 2.740 profissionais sobre o uso do quinto sinal vital." },
+    lawler: { kind: "Artigo científico", title: "Estudo de vida inteira com restrição calórica em labradores", src: "Lawler et al., British Journal of Nutrition, 2008", url: "https://doi.org/10.1017/S0007114507871686", why: "Aprofunda o estudo de Kealy e colaboradores: gordura corporal, resistência à insulina, longevidade e doenças crônicas." },
+    penn: { kind: "Divulgação científica", title: "Study finds dogs fed reduced-calorie diet live nearly two years longer than dogs on unrestricted diet", src: "Penn Today, Universidade da Pensilvânia", url: "https://penntoday.upenn.edu/news/study-finds-dogs-fed-reduced-calorie-diet-live-nearly-two-years-longer-dogs-unrestricted-diet", why: "Resume o estudo, cita o financiamento e traz números sobre osteoartrite e outras doenças." },
+    fda: { kind: "Órgão regulador", title: "FDA Provides Update on Investigation into Potential Connection Between Certain Diets and Cases of Canine Heart Disease", src: "FDA, fevereiro de 2019", url: "https://www.fda.gov/animal-veterinary/cvm-updates/fda-provides-update-investigation-potential-connection-between-certain-diets-and-cases-canine-heart", why: "Mostra como o órgão descreve as notificações, os limites dos dados e o que ainda não sabia." },
+    pfi: { kind: "Imprensa setorial", title: "90% of 524 cases of dog heart disease involved grain-free", src: "Petfoodindustry.com", url: "https://www.petfoodindustry.com/news-newsletters/pet-food-news/article/15465883/90-of-524-cases-of-dog-heart-disease-involved-grain-free", why: "Traz os percentuais de 2019 sobre dietas sem grãos, ervilhas e lentilhas. Leia junto com o texto do FDA." },
+    statista: { kind: "Relatório comercial", title: "Pet Food, Brazil", src: "Statista Market Insights", url: "https://es.statista.com/outlook/cmo/food/pet-food/brazil", why: "Exemplo de estimativa de mercado. Procure a seção de metodologia e compare com outras fontes." },
+    imarc: { kind: "Relatório comercial", title: "Brazil Pet Food Market, Size, Share, Trends and Forecast", src: "IMARC Group", url: "https://www.imarcgroup.com/brazil-pet-food-market", why: "Descreve humanização, premiumização e a limitação pela desigualdade de renda. Boa leitura para treinar a conferência de método." },
+    laorenza: { kind: "Artigo científico", title: "Comprehensive Review of Alternative Proteins in Pet Food", src: "Laorenza et al., Foods, 2025", url: "https://doi.org/10.3390/foods14152640", why: "Revisão sobre proteínas vegetais, aquáticas, de insetos e celulares, com palatabilidade, digestibilidade e regulação." },
+    apch: { kind: "Artigo científico", title: "Current challenges of alternative proteins as future foods", src: "Revisão em acesso aberto (PMC)", url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11327365/", why: "Compara impactos ambientais de proteínas alternativas e aponta que avaliações completas de ciclo de vida ainda são poucas." },
+    gpi: { kind: "Imprensa setorial", title: "Alternative proteins: are we there yet?", src: "Global Pet Industry", url: "https://globalpetindustry.com/article/alternative-proteins-are-we-there-yet/", why: "Discute digestibilidade de insetos e por que a vantagem ambiental não é automática em alimentos pet feitos com subprodutos." },
+    frontiers: { kind: "Agenda de pesquisa", title: "Innovative Sustainable Proteins: Transforming Pet Nutrition for Better Health and Welfare", src: "Frontiers, Research Topic", url: "https://www.frontiersin.org/research-topics/68913", why: "Lista perguntas de pesquisa em aberto: escala, custo, economia circular, pegada ambiental e aceitação do consumidor." },
+    pubmed: { kind: "Base de dados", title: "PubMed", src: "National Library of Medicine", url: "https://pubmed.ncbi.nlm.nih.gov/", why: "Treine a busca combinando o tema com “systematic review” ou “meta-analysis” e confira os estudos incluídos." }
+  };
+
+  var Q = [
+    { th: "S", sub: "Panorama", type: "Dados", r: ["ibge19", "ibge", "reme"],
+      q: "Segundo a Pesquisa Nacional de Saúde (PNS) de 2019, do IBGE, qual afirmação descreve melhor a presença de cães e gatos nos domicílios brasileiros?",
+      o: ["Cães em cerca de 46% dos domicílios (33,8 milhões) e gatos em cerca de 19% (14,1 milhões)", "Gatos presentes em mais domicílios do que cães", "Cães e gatos em proporções parecidas, perto de 46% dos domicílios cada", "Cães em cerca de 25% dos domicílios e gatos em cerca de 10%"], c: 0,
+      hint: "Os cães aparecem em quase metade das casas, e os gatos em menos de um quinto.",
+      exp: "Na PNS 2019, divulgada pelo IBGE em setembro de 2020, 46,1% dos domicílios tinham cães (33,8 milhões) e 19,3% tinham gatos (14,1 milhões). Eram 47,9 milhões de domicílios com cães ou gatos. Na PNS 2013 os percentuais eram 44,3% e 17,7%, então a presença cresceu nas duas espécies. A estimativa do número de animais aparece na edição de 2013: 52,2 milhões de cães e 22,1 milhões de gatos.",
+      crit: "Qual é a edição mais recente da pesquisa, e ela mede domicílios ou animais?",
+      src: "IBGE, PNS 2019 (via Correio Braziliense, 4/9/2020) e PNS 2013 (via Legismap)" },
+    { th: "S", sub: "Quem são os tutores", type: "Dados", r: ["reme", "ibge"],
+      q: "Na PNS 2019, 57,99% dos 88.531 adultos analisados tinham cães ou gatos em casa. Qual grupo ficou acima dessa média?",
+      o: ["Moradores da zona rural, com cerca de 74%", "Pessoas com 60 anos ou mais, com cerca de 51%", "Pessoas com renda acima de três salários mínimos, com cerca de 50%", "Pessoas com ensino superior completo, com cerca de 52%"], c: 0,
+      hint: "Três dos quatro grupos ficaram abaixo da média. Pense em onde há mais espaço e tradição de criar animais.",
+      exp: "A posse foi maior na zona rural (74,32%) e entre solteiros ou separados (59,22%). Foi menor entre idosos (51,08%), pessoas que se declaram pretas (54,16%), renda acima de três salários mínimos (50,47%) e ensino superior completo (52,44%). Já em 2013 o IBGE mostrava cães em 65,0% dos domicílios rurais e 41,0% dos urbanos. O perfil do tutor varia com idade, renda, escolaridade e local de moradia, e isso importa para quem planeja comunicação e produtos.",
+      crit: "Esse perfil descreve associações. Que fatores poderiam explicá-lo?",
+      src: "Herculano de Morais et al., Rev. Min. Enferm., 2026 (PNS 2019); IBGE, PNS 2013 (via Legismap)" },
+    { th: "S", sub: "Idade do dado", type: "Pensamento crítico", crit: true, r: ["ibge19", "ibge"],
+      q: "Uma matéria publicada em 2026 diz que 46,1% dos domicílios brasileiros têm cães e 19,3% têm gatos, sem informar o ano da pesquisa. Qual é a melhor atitude?",
+      o: ["Rastrear a fonte original: esses valores coincidem com os da PNS 2019, divulgada em 2020, ou seja, têm cerca de sete anos", "Usar o dado como atual, porque a matéria é de 2026", "Descartar o dado, porque matérias de divulgação nunca trazem números corretos", "Somar o dado ao de 2013 para obter uma média"], c: 0,
+      hint: "A data de publicação de um texto não é a data da coleta dos dados.",
+      exp: "A matéria atribui os números à PNS do IBGE, mas não diz o ano. Os mesmos percentuais (46,1% e 19,3%) aparecem na divulgação da PNS 2019, feita em 2020, e o ranking por estado também coincide (Rondônia com mais cães, Piauí com mais gatos). Comparar com 2013 (44,3% e 17,7%) mostra crescimento entre edições, e não uma média.",
+      crit: "Qual é o ano da coleta, e não apenas o da publicação?",
+      src: "Cães&Gatos (matéria de 2026, sem ano da PNS); Correio Braziliense, 4/9/2020 (PNS 2019)" },
+    { th: "S", sub: "Companhia e saúde mental", type: "Pensamento crítico", crit: true, r: ["reme"],
+      q: "Entre adultos com diagnóstico médico de depressão, 60,7% tinham cães ou gatos, contra 58% do total de adultos (PNS 2019). O que esse dado permite afirmar?",
+      o: ["Uma associação que se manteve após ajuste por fatores sociodemográficos, mas, por ser um estudo transversal, não prova que cães e gatos tratam ou causam depressão", "Que ter cães ou gatos cura a depressão", "Que a depressão leva as pessoas a adotar animais, e isso está comprovado", "Que não existe relação alguma entre animais de companhia e saúde mental"], c: 0,
+      hint: "Um estudo transversal olha um único momento, então a ordem entre causa e efeito fica em aberto.",
+      exp: "Na PNS 2019, 60,73% de quem relatou depressão tinha cães ou gatos. A associação ajustada foi de 1,06 (IC95% 1,01 a 1,11). Os autores concluem que a posse de animais está associada a fatores sociodemográficos e à saúde mental e pode complementar o tratamento, mas o desenho transversal não permite estabelecer causalidade.",
+      crit: "A associação poderia ir nos dois sentidos? Que outros fatores poderiam explicá-la?",
+      src: "Herculano de Morais et al., Rev. Min. Enferm., 2026" },
+    { th: "S", sub: "Cães de assistência", type: "Dados", r: ["sbu", "epi", "episr"],
+      q: "Cães de assistência são usados com pessoas com autismo, deficiência física e trauma. O que as revisões sistemáticas resumidas pela agência sueca SBU (2019) concluem sobre o efeito desses cães?",
+      o: ["Há sinais promissores, como melhora na interação social e na comunicação em autismo, mas a evidência é limitada: poucos estudos, pequenos e variados, e os autores pedem pesquisas mais rigorosas", "O efeito está comprovado por grandes ensaios clínicos randomizados", "Os estudos mostram que esses cães não trazem benefício algum", "As revisões avaliam apenas cães-guia para pessoas cegas"], c: 0,
+      hint: "Procure a alternativa que reconhece um benefício possível sem prometer certeza.",
+      exp: "O relatório da SBU reuniu quatro revisões sistemáticas: duas sobre autismo (10 e 14 estudos, poucos com cães de serviço), uma sobre trauma (10 estudos, apenas um com cão de serviço psiquiátrico) e uma sobre deficiência física (12 estudos, com um único ensaio randomizado pequeno). Os resultados são promissores, mas inconclusivos. O relatório não traz estudos sobre diabetes ou epilepsia. Para epilepsia há uma revisão de escopo e uma revisão sistemática, indicadas nas leituras.",
+      crit: "O benefício foi medido em quantos participantes e com qual grupo de comparação?",
+      src: "SBU (Suécia), 2019, The effect of assistance dogs for people with physical or psychological disabilities" },
+    { th: "S", sub: "Pandemia", type: "Dados", r: ["carroll22", "carroll24"],
+      q: "Na pandemia de COVID-19, a procura por adoção cresceu e o abandono virou preocupação. O que estudos com organizações de resgate e com tutores indicam?",
+      o: ["O quadro foi misto: houve mais procura por adoção, queda de entregas durante os lockdowns e, em várias organizações, aumento depois. Animais adquiridos perto da pandemia ou como presente tiveram maior risco de entrega", "Todos os animais adotados na pandemia foram abandonados depois", "Não houve aumento de adoção em lugar nenhum", "Cães foram entregues muito mais do que gatos"], c: 0,
+      hint: "Desconfie de alternativas com “todos”, “lugar nenhum” e “muito mais”. Os estudos mostram variação.",
+      exp: "Em entrevistas com 28 organizações de resgate, na maioria do Reino Unido, quase todas notaram mais procura por adoção, 15 relataram queda de entregas, 16 aumento e 6 nenhuma mudança. Em um questionário com 3.945 respostas, 0,74% dos tutores entregaram o animal. Os adquiridos menos de 6 meses antes da pandemia tiveram cerca de 3 vezes mais chance de serem considerados para entrega, os adquiridos depois cerca de 2 vezes, e os recebidos de presente também tiveram risco maior. Não houve diferença entre cães e gatos. Os motivos mais citados foram dificuldade financeira, preocupações de saúde e problemas de comportamento.",
+      crit: "Os dados vêm de onde? São contagens reais ou percepção das equipes?",
+      src: "Carroll, Torjussen e Reeve, Front Vet Sci, 2022; Carroll, Reeve e Torjussen, Animal Welfare, 2024" },
+    { th: "S", sub: "Pandemia", type: "Pensamento crítico", crit: true, r: ["silva21"],
+      q: "Uma pesquisa em Santarém (PA), durante o isolamento social, ouviu 168 tutores e relatou que cerca de 60% perceberam mudança de comportamento nos animais. Qual limitação mais restringe a generalização para o Brasil?",
+      o: ["Amostra de conveniência, de uma só cidade, com maioria de mulheres jovens, e dados baseados na percepção do tutor em vez de avaliação direta do animal", "O fato de a pesquisa ter sido feita durante a pandemia", "O uso de cães e gatos na mesma pesquisa, o que invalida qualquer resultado", "Nenhuma: toda pesquisa com mais de 100 pessoas representa o país"], c: 0,
+      hint: "Pense em quem respondeu, como foi recrutado e o que foi medido.",
+      exp: "Os 168 respondentes foram recrutados por conveniência e bola de neve, em questionário online fechado. Cerca de 80% eram mulheres e 75% tinham de 18 a 30 anos, e a margem de erro declarada foi de 7,6%. Cães e gatos foram analisados juntos e os dados vêm da percepção dos tutores. O estudo é útil como retrato local, mas não representa o Brasil, e não trata de adoção nem de abandono.",
+      crit: "Quem respondeu, como foi recrutado e o que foi realmente medido?",
+      src: "Silva et al., Rev. Acad. Ciênc. Anim., 2021;19:e19002" },
+    { th: "A", sub: "Quinto sinal vital", type: "Conceito", r: ["wsava"],
+      q: "A WSAVA (Associação Mundial de Veterinários de Pequenos Animais) publicou diretrizes que tratam a avaliação nutricional como o “quinto sinal vital”, somado aos quatro sinais vitais já avaliados em toda consulta: temperatura, pulso, respiração e avaliação da dor. O que essa proposta defende?",
+      o: ["Que toda consulta de todo paciente inclua uma avaliação nutricional e uma recomendação específica, junto com temperatura, pulso, respiração e dor", "Que a avaliação nutricional seja feita apenas em animais obesos ou com doença crônica", "Que a avaliação nutricional substitua a aferição de temperatura e pulso", "Que a avaliação nutricional seja feita apenas na primeira consulta de filhotes"], c: 0,
+      hint: "A ideia é somar uma avaliação nova, e não trocar as que já existem.",
+      exp: "As diretrizes da WSAVA (2011) propõem somar a nutrição aos quatro sinais vitais clássicos: temperatura, pulso, respiração e avaliação da dor. A meta é uma avaliação e uma recomendação nutricional específica para cada paciente, em cada visita, com pouco tempo e custo adicionais.",
+      src: "WSAVA Nutritional Assessment Guidelines, J Feline Med Surg, 2011" },
+    { th: "A", sub: "Quinto sinal vital", type: "Aplicação", r: ["wsava"],
+      q: "Um cão adulto saudável, sem fatores de risco nutricionais, chega para a consulta de rotina. O que as diretrizes da WSAVA preveem?",
+      o: ["Triagem nutricional de rotina. A avaliação estendida só entra se houver fatores de risco identificados ou suspeitos", "Avaliação estendida completa, com exames laboratoriais, em todos os animais", "Nenhuma avaliação, porque animais saudáveis não precisam de acompanhamento nutricional", "Apenas a pesagem, sem olhar a dieta nem o manejo alimentar"], c: 0,
+      hint: "A avaliação tem duas etapas. Uma delas é para todos e a outra depende de risco.",
+      exp: "A avaliação nutricional tem duas partes. A triagem é feita em todos os animais. A avaliação estendida é reservada aos casos em que a triagem encontra ou suspeita de fatores de risco nutricionais.",
+      src: "WSAVA Nutritional Assessment Guidelines, 2011" },
+    { th: "A", sub: "Quinto sinal vital", type: "Conceito", r: ["wsava", "vetnurse"],
+      q: "Além do escore de condição corporal (ECC), qual outra medida compõe a triagem nutricional de rotina em cães e gatos?",
+      o: ["Escore de condição muscular (ECM), por inspeção visual e palpação", "Dosagem de taurina no sangue, em todos os animais", "Medida do comprimento dos pelos", "Pressão arterial, que substitui o ECC"], c: 0,
+      hint: "Um animal pode ter peso adequado e, ainda assim, estar perdendo massa magra.",
+      exp: "A triagem reúne histórico, peso corporal e a avaliação visual e por palpação do ECC e do ECM. O ECM importa porque a perda de músculo pode passar despercebida quando só se olha o peso ou a gordura.",
+      src: "WSAVA Nutritional Assessment Guidelines, 2011; Holt, Vet Nurs J, 2021" },
+    { th: "A", sub: "Peso e longevidade", type: "Dados", r: ["lawler", "penn"],
+      q: "No estudo de Kealy e colaboradores (2002), labradores pareados por ninhada receberam a mesma dieta, mas um grupo recebeu 25% menos calorias. Qual foi o principal resultado?",
+      o: ["O grupo restrito teve mediana de vida cerca de 1,8 ano maior (13,0 contra 11,2 anos) e doenças crônicas mais tardias", "Não houve diferença de longevidade, apenas de peso corporal", "O grupo restrito viveu menos, por falta de nutrientes", "O grupo restrito viveu mais, mas adoeceu mais cedo"], c: 0,
+      hint: "Só a quantidade de alimento mudava. A composição da dieta era a mesma nos dois grupos.",
+      exp: "Foram 48 labradores acompanhados por toda a vida. O grupo com restrição de 25% viveu, na mediana, cerca de 1,8 ano a mais, e as doenças crônicas surgiram em média mais de 2 anos depois. O grupo controle também foi ajustado para não ficar com obesidade franca.",
+      src: "Kealy et al., JAVMA, 2002; Lawler et al., Br J Nutr, 2008; Penn Today" },
+    { th: "A", sub: "Peso e longevidade", type: "Pensamento crítico", crit: true, r: ["lawler", "penn"],
+      q: "Ao usar esse estudo para orientar a prática clínica, qual cuidado de leitura é mais adequado?",
+      o: ["Notar que foram 48 cães de uma só raça, em condições controladas e com financiamento da indústria, e generalizar com cautela", "Descartar o estudo, porque foi financiado por uma empresa de alimentos", "Aceitar sem ressalvas, porque estudos de longa duração não têm limitações", "Considerar que vale igualmente para gatos e para todas as raças, sem outros estudos"], c: 0,
+      hint: "Financiamento não invalida um estudo, mas pede atenção. Pense também no tamanho da amostra e na raça.",
+      exp: "O estudo foi financiado pela Nestlé Purina. Isso não o invalida, mas pede uma leitura atenta do delineamento, dos desfechos e se outros grupos chegaram a conclusões parecidas. Amostra pequena e uma única raça limitam a generalização.",
+      crit: "Quem financiou? Quantos animais, de qual raça e em que condições? Outros estudos confirmam?",
+      src: "Penn Today (financiamento e autores); Lawler et al., 2008" },
+    { th: "A", sub: "Dietas e doenças", type: "Pensamento crítico", crit: true, r: ["fda", "pfi"],
+      q: "Em 2019, o FDA divulgou 524 relatos de cardiomiopatia dilatada (DCM) em cães, e cerca de 90% dos casos comiam dietas sem grãos (grain-free), a maioria com ervilha ou lentilha. O que esses dados permitem concluir?",
+      o: ["Um sinal de alerta e uma hipótese a investigar, mas não prova de causa: são relatos voluntários, sem grupo de comparação e sem saber quantos cães comem esses alimentos sem adoecer", "Que dietas sem grãos causam DCM, e isso está comprovado", "Que dietas com grãos protegem o coração", "Que os dados não têm valor algum, porque vieram de notificações"], c: 0,
+      hint: "Falta saber quantos cães comem esses alimentos e não adoecem. Esse é o denominador.",
+      exp: "O FDA tratou os relatos como motivo para investigar, não como prova. A análise de laboratório não achou grande diferença de taurina, minerais ou proteína entre dietas sem grãos e convencionais, muitas dietas com grãos também tinham ervilha ou lentilha, e o mecanismo seguia desconhecido. Cães que mudaram de dieta e receberam tratamento melhoraram em muitos casos.",
+      crit: "Associação não é causa. Qual é o denominador e existe um grupo de comparação?",
+      src: "FDA, atualização de fevereiro de 2019; Petfoodindustry.com (dados até abril de 2019)" },
+    { th: "A", sub: "Dietas e doenças", type: "Conceito", r: ["wsava"],
+      q: "Uma ração traz o selo “completa e balanceada”, ou seja, atende a um perfil nutricional como os da AAFCO ou da FEDIAF. Isso basta para avaliar se ela é adequada para um animal?",
+      o: ["Não. É um ponto de partida: a avaliação também considera o animal (idade, estado fisiológico, doenças), a dieta e o manejo alimentar", "Sim, atender ao perfil nutricional garante que a dieta é adequada para qualquer animal", "Sim, porque o perfil já inclui o controle da quantidade oferecida", "Não, porque perfis nutricionais são irrelevantes para a saúde do animal"], c: 0,
+      hint: "Pense no que muda de um animal para outro: fase de vida, atividade, doenças e como a comida é oferecida.",
+      exp: "As diretrizes da WSAVA ressaltam que a avaliação nutricional vai além de atender a perfis de nutrientes. Ela combina fatores do animal, da dieta e do manejo alimentar, e é refeita ao longo da vida.",
+      src: "WSAVA Nutritional Assessment Guidelines, 2011" },
+
+    { th: "B", sub: "Humanização", type: "Conceito", r: ["imarc", "statista"],
+      q: "No mercado pet, o que se entende por “humanização” dos animais de companhia?",
+      o: ["Tratar cães e gatos como membros da família, o que tende a aumentar o gasto com alimentos premium, naturais e funcionais", "Trocar a ração por comida humana, por recomendação dos veterinários", "Reduzir o consumo de produtos pet em períodos de crise", "Aumentar o número de animais abandonados nas cidades"], c: 0,
+      hint: "É uma mudança de como o tutor enxerga o animal, e isso afeta o que ele aceita pagar.",
+      exp: "Relatórios de mercado citam a humanização como um dos principais motores da premiumização, com mais procura por produtos naturais, funcionais e específicos por fase de vida. Ela é um fator entre vários, e também traz o risco de mitos nutricionais, que a WSAVA aponta como causa de dietas inadequadas.",
+      src: "IMARC Group; Statista; WSAVA" },
+    { th: "B", sub: "Como ler números", type: "Pensamento crítico", crit: true, r: ["imarc"],
+      q: "Relatórios de consultorias apontam avanço dos alimentos premium no Brasil, mas também que a desigualdade de renda limita a adoção e que produtos econômicos e intermediários ainda dominam o volume. Como interpretar?",
+      o: ["Que a tendência é real, porém desigual: o mercado é segmentado por poder de compra, e isso pesa ao recomendar dietas na prática", "Que o mercado premium é irrelevante", "Que todos os tutores já compram produtos premium", "Que a renda não influencia a escolha do alimento"], c: 0,
+      hint: "Duas informações parecem opostas, mas descrevem fatias diferentes do mesmo mercado.",
+      exp: "O crescimento do premium e o domínio do volume econômico convivem, porque o mercado é dividido por renda. Para quem recomenda alimentação, isso significa pensar em custo, acesso e em como orientar bem quem não compra premium.",
+      crit: "A tendência vale para qual parte do mercado e como o relatório mediu isso?",
+      src: "IMARC Group, Brazil Pet Food Market" },
+    { th: "B", sub: "Como ler números", type: "Pensamento crítico", crit: true, r: ["statista", "imarc"],
+      q: "Duas empresas de pesquisa de mercado publicam valores diferentes para o tamanho do mercado de alimentos pet no Brasil. Qual é a melhor primeira atitude?",
+      o: ["Comparar o que cada uma chama de “mercado” (produtos incluídos, ano, moeda, método), ver quem produz e vende o relatório e buscar fontes primárias", "Usar o maior número, porque é o mais animador", "Fazer a média dos dois valores", "Usar o relatório mais caro, porque deve ser mais confiável"], c: 0,
+      hint: "Antes de comparar os números, descubra se eles medem a mesma coisa.",
+      exp: "Estimativas diferem por definição de mercado, ano-base, moeda e método. Um exemplo: a Statista estima receita de cerca de € 6,79 bilhões em 2025 para o setor de alimentos pet no Brasil, enquanto outros relatórios divulgam recortes diferentes, como participação por tipo de animal. Preço do relatório não mede qualidade.",
+      crit: "Quem produziu, quem paga, o que foi contado e como? Existe uma fonte primária?",
+      src: "Statista Market Insights; IMARC Group" },
+    { th: "B", sub: "Tributação", type: "Dados", r: ["congresso", "ipi"],
+      q: "Um projeto apresentado em 2026 (PLP 252/2026) propõe reduzir em 60% o IBS (Imposto sobre Bens e Serviços) e a CBS (Contribuição sobre Bens e Serviços) sobre alimentos completos para cães e gatos. O que a matéria que noticiou o projeto descreve?",
+      o: ["Hoje esses alimentos seguem com tributação integral na reforma tributária, e o projeto os incluiria na lista de redução de 60% da LC 214/2025, sem equipará-los à cesta básica", "O projeto zera os impostos e coloca a ração na cesta básica nacional", "Os alimentos já têm redução de 60% desde a aprovação da reforma", "O projeto cria um imposto novo e específico sobre ração"], c: 0,
+      hint: "Redução de 60% não é isenção, e um projeto de lei ainda é uma proposta.",
+      exp: "Segundo o Congresso em Foco (13/9/2026), o PLP 252/2026, do deputado Julio Cesar Ribeiro (Republicanos-DF), altera a Lei Complementar 214/2025 para incluir “alimentos completos destinados à alimentação de cães e gatos” no Anexo VII, com redução de 60% do IBS e da CBS em vendas internas e importações. A matéria não informa em que fase o projeto está. Sobre tributos já existentes, uma página de consultoria tributária cita IPI de 10% para preparações completas para cães e gatos, conforme a Solução de Consulta Cosit nº 139/2018. ICMS, PIS e Cofins variam por regime e por estado e devem ser conferidos na legislação.",
+      crit: "Isso é lei ou proposta? Em que fase está e onde confirmar?",
+      src: "Congresso em Foco, 13/9/2026; Tributo Devido, 2025 (IPI, fonte secundária)" },
+    { th: "B", sub: "Tributação", type: "Pensamento crítico", crit: true, r: ["congresso"],
+      q: "Um release de entidades do setor pet (maio de 2025) diz que um estudo encomendado por elas mostrou que uma isenção de 60% poderia elevar em até 210% a arrecadação de impostos. Como ler essa projeção?",
+      o: ["Como estimativa de parte interessada: conferir quem encomendou, método e premissas, e comparar com estudos independentes e dados oficiais", "Como fato comprovado, porque traz um número preciso", "Como falsa, porque vem do próprio setor", "Como irrelevante, porque projeções de arrecadação não podem ser avaliadas"], c: 0,
+      hint: "Quem pede redução de impostos para o próprio setor tem interesse no resultado. Isso pede conferência, e não descarte.",
+      exp: "O release apresenta um estudo encomendado pelas próprias entidades como argumento a favor da redução de impostos. Ter interesse não torna o número falso, mas exige checar método e premissas e procurar avaliação independente, por exemplo de órgãos públicos ou universidades.",
+      crit: "Quem encomendou e quem paga? As premissas estão abertas? Existe avaliação independente?",
+      src: "Release Abinpet e Instituto Pet Brasil, maio de 2025" },
+    { th: "B", sub: "Proteínas alternativas", type: "Conceito", r: ["laorenza", "frontiers"],
+      q: "Revisões recentes sobre proteínas alternativas em alimentos pet (insetos, plantas, microrganismos e carne cultivada) apontam quais desafios?",
+      o: ["Palatabilidade, digestibilidade, aprovação regulatória e aceitação do consumidor precisam ser avaliadas com cuidado", "Nenhum: todas já substituem as proteínas convencionais sem diferenças", "Apenas o preço, porque os animais aceitam qualquer alimento", "Falta de interesse científico e comercial"], c: 0,
+      hint: "Pense nos quatro filtros que um novo ingrediente precisa passar até chegar à tigela.",
+      exp: "A revisão de Laorenza e colaboradores (2025) descreve ganhos potenciais em nutrição e sustentabilidade, mas lembra que palatabilidade, digestibilidade, regulação e aceitação do consumidor limitam o uso. A agenda de pesquisa da Frontiers soma escala e custo.",
+      src: "Laorenza et al., Foods, 2025; Frontiers Research Topic" },
+    { th: "B", sub: "Proteínas alternativas", type: "Pensamento crítico", crit: true, r: ["apch", "gpi", "laorenza"],
+      q: "“Proteína de inseto sempre tem menor impacto ambiental do que as proteínas convencionais em alimentos pet.” Essa afirmação é:",
+      o: ["Discutível: costuma ser menor que a da carne convencional, mas alimentos pet usam muitos subprodutos que não competem com a alimentação humana, e faltam avaliações completas de ciclo de vida", "Verdadeira em qualquer comparação", "Falsa, porque insetos têm pegada maior que a de bovinos", "Irrelevante, porque sustentabilidade não pode ser medida"], c: 0,
+      hint: "Atenção à palavra “sempre” e ao ponto de comparação.",
+      exp: "Plantas, insetos e microrganismos tendem a gerar menos carga ambiental que a pecuária, mas estudos completos de ciclo de vida de toda a cadeia são poucos. Em alimentos pet feitos com subprodutos, a vantagem sobre as proteínas atuais nem sempre é clara.",
+      crit: "Menor em comparação com o quê? Existe análise de ciclo de vida completa?",
+      src: "Revisão no PMC sobre proteínas alternativas; Global Pet Industry" },
+    { th: "B", sub: "Evidência e prática", type: "Conceito", r: ["pubmed"],
+      q: "Você quer saber se um probiótico melhora a qualidade das fezes de cães, mas não tem acesso a um canil para testar. Qual fonte de evidência responde melhor à pergunta?",
+      o: ["Revisão sistemática com meta-análise de ensaios controlados", "Relato de caso de um cão que melhorou", "Propaganda do fabricante do produto", "Opinião de um especialista, sem referências"], c: 0,
+      hint: "Procure o desenho que reúne vários estudos com método explícito e reprodutível.",
+      exp: "Uma revisão sistemática com meta-análise combina resultados de vários estudos com critérios definidos de busca, seleção e análise. Sua força depende da qualidade dos estudos incluídos e da heterogeneidade entre eles, e por isso é bom ler a seção de métodos.",
+      src: "Conceito geral de hierarquia de evidências; busca no PubMed" },
+    { th: "B", sub: "Evidência e prática", type: "Pensamento crítico", crit: true, r: ["vetnurse", "wsava"],
+      q: "Em um levantamento citado em um artigo de enfermagem veterinária (Holt, 2021), com 2.740 profissionais (85% enfermeiros ou técnicos), só 27% conheciam as diretrizes da WSAVA e 30% disseram sempre fazer avaliação nutricional. O que isso sugere?",
+      o: ["Que existe uma lacuna entre diretriz e prática, o que torna a implementação e a educação profissional temas legítimos de pesquisa", "Que os profissionais ignoram a ciência de propósito", "Que a avaliação nutricional não tem utilidade clínica", "Que a diretriz está ultrapassada e deve ser abandonada"], c: 0,
+      hint: "Os dados falam de conhecimento e de hábito, e não de intenção ou de utilidade da avaliação.",
+      exp: "Os percentuais indicam que a diretriz existe, mas ainda não chegou à rotina de muitos serviços. Isso abre espaço para estudos de implementação e de formação. Os dados não dizem que a avaliação seja inútil nem que os profissionais ajam de má-fé. Como o número é citado pelo artigo, o próximo passo é procurar o estudo original na lista de referências dele.",
+      crit: "O que o dado mede de fato, e que conclusões ele não permite?",
+      src: "Holt SL, Veterinary Nursing Journal, 2021;36(12):346-349" },
+    { th: "B", sub: "Tendências", type: "Conceito", r: ["frontiers", "laorenza", "imarc"],
+      q: "Qual conjunto reúne temas apontados hoje como tendências de inovação e pesquisa em alimentos para cães e gatos?",
+      o: ["Proteínas alternativas, pegada ambiental e economia circular, alimentos funcionais e nutrição sob medida, e vendas por canais digitais", "Retorno exclusivo às sobras da comida da casa e fim das rações", "Substituição da avaliação veterinária por redes sociais", "Rações idênticas para todas as espécies e fases de vida"], c: 0,
+      hint: "Combine o que as revisões científicas e os relatórios de mercado têm em comum.",
+      exp: "A agenda de pesquisa da Frontiers cita proteínas sustentáveis, economia circular, pegada ambiental e aceitação do consumidor. Relatórios de mercado destacam alimentos funcionais, nutrição sob medida, novos ingredientes e comércio eletrônico.",
+      src: "Frontiers Research Topic; Laorenza et al., 2025; IMARC Group" }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { queue: [], pos: 0, answers: {}, round: "full", locked: false, hits: 0 };
+  var bowlN = 0;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function shuffle(a) { var b = a.slice(), i, j, t; for (i = b.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = b[i]; b[i] = b[j]; b[j] = t; } return b; }
+  function show(id) { ["home", "quiz", "result"].forEach(function (s) { $(s).hidden = s !== id; }); $("restart").hidden = id === "home"; window.scrollTo(0, 0); }
+
+  function prepare(ids) {
+    ids.forEach(function (i) {
+      var q = Q[i];
+      q.opts = shuffle(q.o.map(function (t, k) { return { t: t, ok: k === q.c }; }));
+    });
+  }
+
+  function begin(ids, round) {
+    state.queue = ids; state.pos = 0; state.answers = {}; state.round = round; state.hits = 0;
+    $("bowlslot").innerHTML = bowl(); $("hits").textContent = hitsLabel();
+    prepare(ids); show("quiz"); renderQ();
+  }
+
+  function renderSeg() {
+    $("seg").innerHTML = state.queue.map(function (qi, k) {
+      var a = state.answers[qi], cls = a ? (a.ok ? "ok" : "no") : (k === state.pos ? "cur" : "");
+      return '<i class="' + cls + '"></i>';
+    }).join("");
+  }
+
+  function renderQ() {
+    var qi = state.queue[state.pos], q = Q[qi];
+    state.locked = false;
+    $("qcount").textContent = "Questão " + (state.pos + 1) + " de " + state.queue.length + (state.round === "review" ? " · revisão dos erros" : "");
+    $("qtheme").textContent = THEMES[q.th];
+    $("tags").innerHTML = '<span class="tag">' + esc(q.sub) + '</span><span class="tag' + (q.crit ? " crit" : "") + '">' + esc(q.type) + "</span>";
+    $("qtext").textContent = q.q;
+    $("opts").innerHTML = '<legend style="position:absolute;left:-9999px">Alternativas</legend>' + q.opts.map(function (o, k) {
+      return '<label class="opt"><input type="radio" name="opt" value="' + k + '"><span class="let">' + "ABCD"[k] + '</span><span class="tx">' + esc(o.t) + "</span></label>";
+    }).join("");
+    $("hint").hidden = true; $("hint").textContent = q.hint; $("hintBtn").textContent = "Mostrar dica"; $("hintBtn").hidden = false;
+    $("fb").innerHTML = "";
+    $("confirm").hidden = false; $("confirm").disabled = true; $("next").hidden = true;
+    renderSeg();
+    $("qtext").focus({ preventScroll: true });
+  }
+
+  function confirmAnswer() {
+    var sel = document.querySelector('#opts input:checked');
+    if (!sel || state.locked) return;
+    state.locked = true;
+    var qi = state.queue[state.pos], q = Q[qi], pick = +sel.value, ok = q.opts[pick].ok;
+    state.answers[qi] = { pick: pick, ok: ok, pickText: q.opts[pick].t };
+    if (ok) {
+      state.hits++;
+      var bs = $("bowlslot").querySelector(".bowl");
+      setFill(bs, state.hits / state.queue.length); pour(bs);
+    }
+    $("hits").textContent = hitsLabel();
+    var labels = document.querySelectorAll("#opts .opt");
+    labels.forEach(function (l, k) {
+      l.classList.add("locked");
+      l.querySelector("input").disabled = true;
+      if (q.opts[k].ok) l.classList.add("right");
+      else if (k === pick) l.classList.add("wrong");
+      else l.classList.add("dim");
+    });
+    var right = "ABCD"[q.opts.findIndex(function (o) { return o.ok; })];
+    $("fb").innerHTML = '<div class="fb ' + (ok ? "ok" : "no") + '" role="status"><h3>' + (ok ? "Acertou" : "A resposta certa é a alternativa " + right) + "</h3><p>" + esc(q.exp) + "</p>" +
+      (q.crit ? '<div class="crit-box"><b>Pergunta para levar</b>' + esc(q.crit) + "</div>" : "") +
+      '<p class="src">Fonte: ' + esc(q.src) + "</p></div>";
+    $("confirm").hidden = true; $("hintBtn").hidden = true; $("hint").hidden = true;
+    var last = state.pos === state.queue.length - 1;
+    $("next").textContent = last ? "Ver meu resultado" : "Próxima questão"; $("next").hidden = false;
+    renderSeg();
+    $("next").focus({ preventScroll: true });
+  }
+
+  function nextQ() {
+    if (state.pos < state.queue.length - 1) { state.pos++; renderQ(); window.scrollTo(0, 0); }
+    else renderResult();
+  }
+
+  var BOWL_PATH = "M12 42 H108 C108 74 88 94 60 94 C32 94 12 74 12 42 Z";
+  function bowl() {
+    var id = "bc" + (++bowlN), kibs = "";
+    [[24, 97], [38, 100], [52, 97], [66, 100], [80, 97], [94, 100], [108, 97]].forEach(function (p) { kibs += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.5" fill="var(--kib)"/>'; });
+    return '<svg class="bowl" viewBox="0 0 120 104" style="overflow:visible" role="img" aria-label="Potinho de ração que enche conforme os acertos">' +
+      '<defs><clipPath id="' + id + '"><path d="' + BOWL_PATH + '"/></clipPath></defs>' +
+      '<path d="' + BOWL_PATH + '" fill="var(--surface)"/>' +
+      '<g clip-path="url(#' + id + ')"><g class="fill"><rect x="0" y="94" width="120" height="70" fill="var(--hi)"/>' + kibs + '</g></g>' +
+      '<path d="' + BOWL_PATH + '" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>' +
+      '<ellipse cx="60" cy="42" rx="48" ry="8" fill="none" stroke="var(--ink)" stroke-width="4"/>' +
+      '<g class="drops"><circle cx="44" cy="30" r="4.5" fill="var(--kib)"/><circle cx="60" cy="24" r="4.5" fill="var(--kib)"/><circle cx="76" cy="30" r="4.5" fill="var(--kib)"/></g></svg>';
+  }
+  function setFill(svg, frac) {
+    if (!svg) return;
+    svg.querySelector(".fill").style.transform = "translateY(" + (-52 * Math.max(0, Math.min(1, frac))) + "px)";
+  }
+  function pour(svg) {
+    if (!svg) return;
+    var d = svg.querySelector(".drops");
+    d.classList.remove("go"); void d.getBoundingClientRect(); d.classList.add("go");
+  }
+  function hitsLabel() { return state.hits + (state.hits === 1 ? " acerto" : " acertos"); }
+
+  function renderResult() {
+    var ids = state.queue, total = ids.length, hits = 0, byTheme = { S: { n: 0, ok: 0 }, A: { n: 0, ok: 0 }, B: { n: 0, ok: 0 } }, missed = [];
+    ids.forEach(function (qi) {
+      var a = state.answers[qi], q = Q[qi];
+      byTheme[q.th].n++;
+      if (a.ok) { hits++; byTheme[q.th].ok++; } else missed.push(qi);
+    });
+    var msg = missed.length === 0
+      ? "Você acertou tudo nesta rodada. Que tal ir além com as leituras de aprofundamento abaixo?"
+      : "Cada erro vem com a explicação e a leitura certa para tirar a dúvida. Errar aqui faz parte de estudar.";
+    var h = '<div class="res-head">' + bowl() + '<div><p class="eyebrow">' + (state.round === "review" ? "Revisão dos erros" : "Seu resultado") + '</p><div class="score">' + hits + ' <small>de ' + total + ' acertos</small></div><p>' + msg + "</p></div></div>";
+
+    h += '<div class="bars">' + ["S", "A", "B"].filter(function (t) { return byTheme[t].n > 0; }).map(function (t) {
+      var b = byTheme[t];
+      return '<div class="bar"><b><span>' + THEMES[t] + "</span><span>" + b.ok + " de " + b.n + '</span></b><div class="track"><span style="width:' + Math.round(100 * b.ok / b.n) + '%"></span></div></div>';
+    }).join("") + "</div>";
+
+    if (missed.length) {
+      h += '<div class="sec"><h2>Onde vale reforçar</h2><p class="sub">Abra cada questão para rever a explicação.</p><div class="list">' + missed.map(function (qi) {
+        var q = Q[qi], a = state.answers[qi], rightText = q.o[q.c];
+        return '<details class="miss"><summary><span class="n">' + (qi + 1) + '</span><span>' + esc(q.q) + '</span></summary><div class="body"><p class="yours">Sua resposta: ' + esc(a.pickText) + '</p><p class="correct">Resposta certa: ' + esc(rightText) + "</p><p>" + esc(q.exp) + "</p>" +
+          (q.crit ? '<div class="crit-box"><b>Pergunta para levar</b>' + esc(q.crit) + "</div>" : "") + "</div></details>";
+      }).join("") + "</div></div>";
+    }
+
+    var rank = {}, rel = {};
+    missed.forEach(function (qi) { Q[qi].r.forEach(function (k) { rank[k] = (rank[k] || 0) + 1; (rel[k] = rel[k] || []).push(qi + 1); }); });
+    var keys = Object.keys(rank);
+    var order = Object.keys(READINGS);
+    var title, sub;
+    if (keys.length) {
+      keys.sort(function (a, b) { return rank[b] - rank[a] || order.indexOf(a) - order.indexOf(b); });
+      title = "Leituras recomendadas para você"; sub = "Escolhidas a partir das questões que você errou. Os textos estão do mais ligado aos seus erros para o menos ligado.";
+    } else {
+      keys = ["laorenza", "wsava", "frontiers", "lawler"]; title = "Para ir além"; sub = "Você não errou nada, então aqui vão leituras de aprofundamento sobre os dois temas.";
+    }
+    h += '<div class="sec"><h2>' + title + '</h2><p class="sub">' + sub + '</p><div class="list">' + keys.map(function (k) {
+      var r = READINGS[k];
+      return '<article class="read"><span class="kind">' + esc(r.kind) + '</span><h3><a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.title) + '</a></h3><p>' + esc(r.src) + '</p><p class="why">' + esc(r.why) + "</p>" +
+        (rel[k] ? '<p class="rel">Ligado às questões ' + rel[k].join(", ") + "</p>" : "") + "</article>";
+    }).join("") + "</div></div>";
+
+    h += '<div class="row-btn">' + (missed.length ? '<button class="btn" id="redoWrong">Refazer só as questões que errei</button>' : "") + '<button class="btn ghost" id="redoAll">Refazer o teste completo</button></div>';
+    $("result").innerHTML = h;
+    show("result");
+    var rb = $("result").querySelector(".bowl"), fr = total ? hits / total : 0;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { setFill(rb, fr); }); });
+    var rw = $("redoWrong"); if (rw) rw.addEventListener("click", function () { begin(missed.slice(), "review"); });
+    $("redoAll").addEventListener("click", function () { begin(Q.map(function (_, i) { return i; }), "full"); });
+  }
+
+  (function () {
+    var c = { S: 0, A: 0, B: 0 };
+    Q.forEach(function (q) { c[q.th]++; });
+    document.querySelectorAll("[data-count]").forEach(function (el) { el.textContent = c[el.getAttribute("data-count")]; });
+    document.querySelectorAll("[data-total]").forEach(function (el) { el.textContent = Q.length; });
+  })();
+  $("start").addEventListener("click", function () { begin(Q.map(function (_, i) { return i; }), "full"); });
+  $("restart").addEventListener("click", function () { show("home"); });
+  $("opts").addEventListener("change", function () { if (!state.locked) $("confirm").disabled = false; });
+  $("confirm").addEventListener("click", confirmAnswer);
+  $("next").addEventListener("click", nextQ);
+  $("hintBtn").addEventListener("click", function () {
+    var hd = $("hint"); hd.hidden = !hd.hidden; $("hintBtn").textContent = hd.hidden ? "Mostrar dica" : "Esconder dica";
+  });
+})();
+</script>
