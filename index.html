@@ -37,6 +37,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55;
   padding-block: 20px 64px;
@@ -538,6 +539,7 @@ button { font: inherit; color: inherit; }
   }
 
   function nextQ() {
+    if (!state.answers[state.queue[state.pos]]) return;
     if (state.pos < state.queue.length - 1) { state.pos++; renderQ(); window.scrollTo(0, 0); }
     else renderResult();
   }
@@ -569,6 +571,7 @@ button { font: inherit; color: inherit; }
     var ids = state.queue, total = ids.length, hits = 0, byTheme = { S: { n: 0, ok: 0 }, A: { n: 0, ok: 0 }, B: { n: 0, ok: 0 } }, missed = [];
     ids.forEach(function (qi) {
       var a = state.answers[qi], q = Q[qi];
+      if (!a) { a = state.answers[qi] = { pick: -1, ok: false, pickText: "Sem resposta" }; }
       byTheme[q.th].n++;
       if (a.ok) { hits++; byTheme[q.th].ok++; } else missed.push(qi);
     });
