@@ -253,10 +253,11 @@ button { font: inherit; color: inherit; }
         <div id="hint" class="hint" hidden></div>
         <div id="fb"></div>
         <div class="actions">
+          <button class="btn ghost small" id="back" type="button" disabled>Voltar</button>
           <button class="btn ghost small" id="hintBtn" type="button">Mostrar dica</button>
           <span class="spacer"></span>
           <button class="btn" id="confirm" type="button" disabled>Confirmar resposta</button>
-          <button class="btn" id="next" type="button" hidden>Próxima questão</button>
+          <button class="btn" id="next" type="button" disabled>Próxima questão</button>
         </div>
       </div>
     </section>
@@ -491,8 +492,8 @@ button { font: inherit; color: inherit; }
   }
 
   function renderQ() {
-    var qi = state.queue[state.pos], q = Q[qi];
-    state.locked = false;
+    var qi = state.queue[state.pos], q = Q[qi], a = state.answers[qi];
+    state.locked = !!a;
     $("qcount").textContent = "Questão " + (state.pos + 1) + " de " + state.queue.length + (state.round === "review" ? " · revisão dos erros" : "");
     $("qtheme").textContent = THEMES[q.th];
     $("tags").innerHTML = '<span class="tag">' + esc(q.sub) + '</span><span class="tag' + (q.crit ? " crit" : "") + '">' + esc(q.type) + "</span>";
@@ -502,9 +503,33 @@ button { font: inherit; color: inherit; }
     }).join("");
     $("hint").hidden = true; $("hint").textContent = q.hint; $("hintBtn").textContent = "Mostrar dica"; $("hintBtn").hidden = false;
     $("fb").innerHTML = "";
-    $("confirm").hidden = false; $("confirm").disabled = true; $("next").hidden = true;
+    $("back").disabled = state.pos === 0;
+    $("confirm").disabled = true; $("next").disabled = true;
+    $("next").textContent = state.pos === state.queue.length - 1 ? "Ver meu resultado" : "Próxima questão";
+    if (a) {
+      var r = document.querySelector('#opts input[value="' + a.pick + '"]');
+      if (r) r.checked = true;
+      lockAnswer(qi);
+    }
     renderSeg();
     $("qtext").focus({ preventScroll: true });
+  }
+
+  function lockAnswer(qi) {
+    var q = Q[qi], a = state.answers[qi];
+    document.querySelectorAll("#opts .opt").forEach(function (l, k) {
+      l.classList.add("locked");
+      l.querySelector("input").disabled = true;
+      if (q.opts[k].ok) l.classList.add("right");
+      else if (k === a.pick) l.classList.add("wrong");
+      else l.classList.add("dim");
+    });
+    var right = "ABCD"[q.opts.findIndex(function (o) { return o.ok; })];
+    $("fb").innerHTML = '<div class="fb ' + (a.ok ? "ok" : "no") + '" role="status"><h3>' + (a.ok ? "Acertou" : "A resposta certa é a alternativa " + right) + "</h3><p>" + esc(q.exp) + "</p>" +
+      (q.crit ? '<div class="crit-box"><b>Pergunta para levar</b>' + esc(q.crit) + "</div>" : "") +
+      '<p class="src">Fonte: ' + esc(q.src) + "</p></div>";
+    $("confirm").disabled = true; $("next").disabled = false;
+    $("hintBtn").hidden = true; $("hint").hidden = true;
   }
 
   function confirmAnswer() {
@@ -519,23 +544,13 @@ button { font: inherit; color: inherit; }
       setFill(bs, state.hits / state.queue.length); pour(bs);
     }
     $("hits").textContent = hitsLabel();
-    var labels = document.querySelectorAll("#opts .opt");
-    labels.forEach(function (l, k) {
-      l.classList.add("locked");
-      l.querySelector("input").disabled = true;
-      if (q.opts[k].ok) l.classList.add("right");
-      else if (k === pick) l.classList.add("wrong");
-      else l.classList.add("dim");
-    });
-    var right = "ABCD"[q.opts.findIndex(function (o) { return o.ok; })];
-    $("fb").innerHTML = '<div class="fb ' + (ok ? "ok" : "no") + '" role="status"><h3>' + (ok ? "Acertou" : "A resposta certa é a alternativa " + right) + "</h3><p>" + esc(q.exp) + "</p>" +
-      (q.crit ? '<div class="crit-box"><b>Pergunta para levar</b>' + esc(q.crit) + "</div>" : "") +
-      '<p class="src">Fonte: ' + esc(q.src) + "</p></div>";
-    $("confirm").hidden = true; $("hintBtn").hidden = true; $("hint").hidden = true;
-    var last = state.pos === state.queue.length - 1;
-    $("next").textContent = last ? "Ver meu resultado" : "Próxima questão"; $("next").hidden = false;
+    lockAnswer(qi);
     renderSeg();
     $("next").focus({ preventScroll: true });
+  }
+
+  function prevQ() {
+    if (state.pos > 0) { state.pos--; renderQ(); window.scrollTo(0, 0); }
   }
 
   function nextQ() {
@@ -630,6 +645,7 @@ button { font: inherit; color: inherit; }
   $("opts").addEventListener("change", function () { if (!state.locked) $("confirm").disabled = false; });
   $("confirm").addEventListener("click", confirmAnswer);
   $("next").addEventListener("click", nextQ);
+  $("back").addEventListener("click", prevQ);
   $("hintBtn").addEventListener("click", function () {
     var hd = $("hint"); hd.hidden = !hd.hidden; $("hintBtn").textContent = hd.hidden ? "Mostrar dica" : "Esconder dica";
   });
